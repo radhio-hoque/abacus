@@ -1,6 +1,6 @@
 # abacus
 
-A new Flutter project.
+Abacus UI Neumorphism Flutter project, dark_sunglasses dark mode compatible.
 
 ## Getting Started
 
