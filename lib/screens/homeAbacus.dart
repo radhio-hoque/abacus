@@ -18,6 +18,11 @@ class _HomeAbacusState extends State<HomeAbacus> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: darkMode ? darkTheme : lightTheme,
+        title: Text("Abacus", style: TextStyle(color: darkMode ? lightTheme : darkTheme),),
+        centerTitle: true,
+      ),
       backgroundColor: darkMode ? darkTheme : lightTheme,
       body: SafeArea(
         child: Padding(
