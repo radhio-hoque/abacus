@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 import '../utility/constant.dart';
 
 class HomeAbacus extends StatefulWidget {
@@ -10,6 +11,9 @@ class HomeAbacus extends StatefulWidget {
 
 class _HomeAbacusState extends State<HomeAbacus> {
   bool darkMode = false;
+  String equation = '0';
+  String result = '0';
+  String expression = '';
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +29,12 @@ class _HomeAbacusState extends State<HomeAbacus> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       setState(() {
                         darkMode = !darkMode;
                       });
                     },
-                    child:_switchMode() ,
+                    child: _switchMode(),
                   ),
                   const SizedBox(
                     height: 80.0,
@@ -38,7 +42,7 @@ class _HomeAbacusState extends State<HomeAbacus> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      '6.010',
+                      result,
                       style: TextStyle(
                           color: darkMode ? Colors.white : Colors.redAccent,
                           fontSize: 55,
@@ -55,7 +59,7 @@ class _HomeAbacusState extends State<HomeAbacus> {
                             color: darkMode ? Colors.green : Colors.grey),
                       ),
                       Text(
-                        '10+500*12',
+                        equation,
                         style: TextStyle(
                             fontSize: 20,
                             color: darkMode ? Colors.green : Colors.grey),
@@ -152,28 +156,35 @@ class _HomeAbacusState extends State<HomeAbacus> {
       Color? titleColor}) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: AbacusCenter(
-        darkMood: darkMode,
-        padding: EdgeInsets.all(padding),
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: SizedBox(
-          width: padding * 2,
-          height: padding * 2,
-          child: Center(
-            child: title != null
-                ? Text(
-                    title,
-                    style: TextStyle(
-                      color: titleColor ??
-                          (darkMode ? Colors.white : Colors.black),
-                      fontSize: 30.0,
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _buttonPressed(title, iconData);
+          });
+        },
+        child: AbacusCenter(
+          darkMood: darkMode,
+          padding: EdgeInsets.all(padding),
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: SizedBox(
+            width: padding * 2,
+            height: padding * 2,
+            child: Center(
+              child: title != null
+                  ? Text(
+                      title,
+                      style: TextStyle(
+                        color: titleColor ??
+                            (darkMode ? Colors.white : Colors.black),
+                        fontSize: 30.0,
+                      ),
+                    )
+                  : Icon(
+                      iconData,
+                      color: iconColor,
+                      size: 30,
                     ),
-                  )
-                : Icon(
-                    iconData,
-                    color: iconColor,
-                    size: 30,
-                  ),
+            ),
           ),
         ),
       ),
@@ -186,20 +197,27 @@ class _HomeAbacusState extends State<HomeAbacus> {
       double borderRadius = 50.0}) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: AbacusCenter(
-        darkMood: darkMode,
-        padding:
-            EdgeInsets.symmetric(horizontal: padding, vertical: padding / 2),
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: SizedBox(
-          width: padding * 2,
-          child: Center(
-            child: Text(
-              title,
-              style: TextStyle(
-                color: darkMode ? Colors.white : Colors.black,
-                fontSize: 15.0,
-                fontWeight: FontWeight.bold,
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _buttonPressed(title, null);
+          });
+        },
+        child: AbacusCenter(
+          darkMood: darkMode,
+          padding:
+              EdgeInsets.symmetric(horizontal: padding, vertical: padding / 2),
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: SizedBox(
+            width: padding * 2,
+            child: Center(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: darkMode ? Colors.white : Colors.black,
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -218,12 +236,50 @@ class _HomeAbacusState extends State<HomeAbacus> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(Icons.sunny, color: darkMode ? Colors.grey : Colors.redAccent,),
-            Icon(Icons.nightlight_round, color: darkMode? Colors.green : Colors.grey,),
+            Icon(
+              Icons.sunny,
+              color: darkMode ? Colors.grey : Colors.redAccent,
+            ),
+            Icon(
+              Icons.nightlight_round,
+              color: darkMode ? Colors.green : Colors.grey,
+            ),
           ],
         ),
       ),
     );
+  }
+
+  void _buttonPressed(String? title, IconData? iconData) {
+    setState(() {
+      if (title != null) {
+        if (title == 'C') {
+          equation = '0';
+          result = '0';
+        } else if (title == '=') {
+          expression = equation;
+          try {
+            Parser parser = Parser();
+            Expression exp = parser.parse(expression);
+            ContextModel cm = ContextModel();
+            result = '${exp.evaluate(EvaluationType.REAL, cm)}';
+          } catch (ex) {
+            result = 'Error';
+          }
+        } else {
+          if (equation == '0') {
+            equation = title;
+          } else {
+            equation = equation + title;
+          }
+        }
+      } else if (iconData != null) {
+        equation = equation.substring(0, equation.length - 1);
+        if (equation.isEmpty) {
+          equation = '0';
+        }
+      }
+    });
   }
 }
 
