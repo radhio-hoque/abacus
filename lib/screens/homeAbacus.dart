@@ -149,7 +149,7 @@ class _HomeAbacusState extends State<HomeAbacus> {
 
   _buttonRounded(
       {String? title,
-      double padding = 20.0,
+      double padding = 15.0,
       double borderRadius = 40.0,
       IconData? iconData,
       Color? iconColor,
